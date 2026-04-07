@@ -36,7 +36,6 @@ net.Receive("duckboard_ply_connect", function()
     local sid = net.ReadString()
     local time = net.ReadFloat()
 
-    print("STARTING " .. sid .. " " .. time)
     Duckboard.SessionTimes[sid] = time
     hook.Run("Duckboard_Force_Refresh")
     PrintTable(Duckboard.SessionTimes)

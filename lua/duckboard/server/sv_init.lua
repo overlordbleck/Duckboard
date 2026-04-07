@@ -5,7 +5,6 @@ util.AddNetworkString("duckboard_ply_connect")
 util.AddNetworkString("duckboard_ply_diconnect")
 
 local function sendSessionStartData(sid, time)
-    print("STARTING " .. sid .. " " .. time)
     net.Start("duckboard_ply_connect")
         net.WriteString(sid)
         net.WriteFloat(time)

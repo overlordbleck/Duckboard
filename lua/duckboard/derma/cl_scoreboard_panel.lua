@@ -8,6 +8,7 @@ local TEXT_COLOR = Color(255, 255, 255)
 local DIV_COLOR = Color(57,62,85)
 local FOOTER_COLOR = Color(36, 41, 67)
 local LEGEND_HEIGHT = 30
+local heightPadding = 200
 
 local function getUptime()
     local t = CurTime()
@@ -20,13 +21,11 @@ local function getUptime()
 end
 
 function PANEL:Init()
-    local scrW, scrH = ScrW(), ScrH()
-    local heightPadding = 200
     self.visible = false
     self:SetTitle("")
     self:SetDraggable(false)
     self:ShowCloseButton(false)
-    self:SetSize(scrW / 2.5, ScrH() - heightPadding)
+    self:SetSize(768, ScrH() - heightPadding)
     self:Center()
     --self:DockPadding(5, 5, 5, 5)
     self:DockPadding(0, 0, 0, 0)
@@ -161,9 +160,9 @@ function PANEL:Init()
         end
     end)
 
-    self.playerDiv = vgui.Create("DPanel", self)
+    self.playerDiv = vgui.Create("DScrollPanel", self)
     self.playerDiv:Dock(FILL)
-    self.playerDiv:DockPadding(0, 0, 0, 5)
+    --self.playerDiv:DockPadding(0, 0, 0, 5)
     self.playerDiv.Paint = function() end
     self.playerDiv.divs = {}
 
@@ -177,8 +176,9 @@ function PANEL:Init()
 
         self.playerDiv.divs = {}
         for _, ply in pairs(player.GetAll()) do
-            local pc = vgui.Create("duckboard_player_info", self.playerDiv)
+            local pc = vgui.Create("duckboard_player_info")
             pc:SetPlayer(ply)
+            self.playerDiv:AddItem(pc)
             self.playerDiv.divs[ply] = pc
         end
     end
@@ -242,6 +242,8 @@ function PANEL:EnableInteraction()
     --self:SetPopupStayAtBack(true)
     self:MakePopup()
     self:SetKeyboardInputEnabled(false)
+    self:SetSize(768, ScrH() - heightPadding)
+    self:Center()
 end
 
 function PANEL:DisableInteraction()
