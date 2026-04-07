@@ -1,0 +1,7 @@
+Config Ideas
+- Cursor show on open?
+- Opacity
+- Highlight YOU?
+- Show ping (maybe)
+- Performance display graph
+- animations
