@@ -77,6 +77,17 @@ function PANEL:Init()
         self.extrasGrid:SetColWide(100)
         self.extrasGrid:SetContentAlignment(6)
 
+        if Duckboard.Config.Legend.showBadges then
+            local badges = vgui.Create("DLabel")
+            badges:SetTall(LEGEND_HEIGHT)
+            badges:SetWide(100)
+            badges:SetText("BADGES")
+            badges:SetTextColor(TEXT_COLOR)
+            badges:SetFont("DUCK_FONT_LEGEND")
+            badges:SetContentAlignment(5)
+            self.extrasGrid:AddItem(badges)
+        end
+
         if Duckboard.Config.Legend.showKillDeaths then
             local kdDiv = vgui.Create("DGrid")
             kdDiv:SetCols(2)

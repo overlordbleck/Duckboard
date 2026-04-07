@@ -7,7 +7,32 @@ Duckboard.Config.nameRanks = true
 Duckboard.Config.showPerformanceGraph = false
 Duckboard.Config.showTotalTimeFormatted = false
 Duckboard.Config.Legend.showKillDeaths = true
-Duckboard.Config.Legend.showSessionTime = true
+Duckboard.Config.Legend.showBadges = true
+Duckboard.Config.Legend.showSessionTime = false
 Duckboard.Config.Legend.showTotalTime = true
 Duckboard.Config.Legend.showRank = true
 Duckboard.Config.Legend.showPing = true
+
+Duckboard.Config.Badges = {
+    admin = {
+        icon = "icon16/shield.png",
+        hoverText = "Admin"
+    },
+    afk = {
+        icon = "icon16/clock_red.png",
+        hoverText = "AFK"
+    },
+    pvp = {
+        icon = "icon16/bomb.png",
+        hoverText = "PvPing"
+    },
+    connecting = {
+        icon = "icon16/transmit_go.png",
+        hoverText = "Connecting"
+    },
+    disconnecting = {
+        icon = "icon16/transmit_delete.png",
+        hoverText = "Connecting"
+    }
+
+}

@@ -57,6 +57,23 @@ function PANEL:Init()
     self.extrasGrid:SetColWide(100)
     self.extrasGrid:SetContentAlignment(6)
 
+    if Duckboard.Config.Legend.showBadges then
+        self.badgesDiv = vgui.Create("DPanel")
+        self.badgesDiv:SetTall(t)
+        self.badgesDiv:SetWide(100)
+        self.badgesDiv:SetContentAlignment(5)
+        self.badgesDiv.Paint = function() end
+        self.extrasGrid:AddItem(self.badgesDiv)
+
+        self.badgesDiv.badgePanel = vgui.Create("duckboard_badge_panel", self.badgesDiv)
+        self.badgesDiv.badgePanel:SetTall(t)
+        self.badgesDiv.badgePanel:AddBadge("admin")
+        self.badgesDiv.badgePanel:AddBadge("afk")
+        self.badgesDiv.badgePanel:AddBadge("pvp")
+        self.badgesDiv.badgePanel:AddBadge("connecting")
+        self.badgesDiv.badgePanel:AddBadge("disconnecting")
+    end
+
     if Duckboard.Config.Legend.showKillDeaths then
         local kdDiv = vgui.Create("DGrid")
         kdDiv:SetCols(2)
