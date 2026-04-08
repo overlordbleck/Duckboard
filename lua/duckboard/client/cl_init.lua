@@ -37,7 +37,7 @@ net.Receive("duckboard_ply_connect", function()
     local time = net.ReadFloat()
 
     Duckboard.SessionTimes[sid] = time
-    hook.Run("Duckboard_Force_Refresh")
+    hook.Run("Duckboard_Force_Refresh", sid)
     PrintTable(Duckboard.SessionTimes)
 end)
 
@@ -45,7 +45,7 @@ net.Receive("duckboard_ply_disconnect", function()
     local sid = net.ReadString()
 
     table.remove(Duckboard.SessionTimes, sid)
-    hook.Run("Duckboard_Force_Refresh")
+    hook.Run("Duckboard_Force_Refresh", sid)
 end)
 
 local function BuildScoreboard()

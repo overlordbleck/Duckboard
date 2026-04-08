@@ -3,7 +3,7 @@ Duckboard.Config = Duckboard.Config or {}
 local PANEL = {}
 
 local BG_COLOR = Color(57, 62, 85, 255)
-local LEGEND_COLOR = Color(32, 36, 60,255)
+local LEGEND_COLOR = Color(32, 36, 60, 255)
 local TEXT_COLOR = Color(255, 255, 255)
 local DIV_COLOR = Color(57,62,85)
 local FOOTER_COLOR = Color(36, 41, 67)
@@ -40,13 +40,13 @@ function PANEL:Init()
         self.playerLegend:Dock(TOP)
 
         function self.playerLegend:Paint(w, h)
-            surface.SetDrawColor(LEGEND_COLOR.r, LEGEND_COLOR.g, LEGEND_COLOR.b, LEGEND_COLOR.a)
+            surface.SetDrawColor(LEGEND_COLOR)
             surface.DrawRect(0, 0, w, h)
 
-            surface.SetDrawColor(DIV_COLOR.r, DIV_COLOR.g, DIV_COLOR.b, DIV_COLOR.a)
+            surface.SetDrawColor(DIV_COLOR)
             surface.DrawLine(0, 0, w, 0)
 
-            surface.SetDrawColor(DIV_COLOR.r, DIV_COLOR.g, DIV_COLOR.b, DIV_COLOR.a)
+            surface.SetDrawColor(DIV_COLOR)
             surface.DrawLine(0, 1, w, 1)
 
             -- surface.SetDrawColor(DIV_COLOR.r, DIV_COLOR.g, DIV_COLOR.b, DIV_COLOR.a)
@@ -166,8 +166,12 @@ function PANEL:Init()
     self.playerDiv.Paint = function() end
     self.playerDiv.divs = {}
 
-
-    local function refresh()
+    local function refresh(sid)
+        local p = nil
+        if IsValid(sid) then
+            p = player.GetBySteamID(sid)
+        end
+        -- TODO: UPDATE THIS REFRESHING CODE
         if table.Count(self.playerDiv.divs) ~= 0 then
             for _, p in pairs(self.playerDiv.divs) do
                 p:Remove()
