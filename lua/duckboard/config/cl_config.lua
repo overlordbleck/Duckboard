@@ -6,6 +6,11 @@ Duckboard.Config.mouseOnOpen = true -- Enables interaction upon opening the scor
 Duckboard.Config.nameRanks = true
 Duckboard.Config.showPerformanceGraph = false
 Duckboard.Config.showTotalTimeFormatted = false
+Duckboard.Config.showRecentlyDisconnected = true
+Duckboard.Config.showConnecting = true
+Duckboard.Config.showDisconnected = true
+Duckboard.Config.collapseInfoUponOpening = true
+
 Duckboard.Config.Legend.showKillDeaths = true
 Duckboard.Config.Legend.showBadges = true
 Duckboard.Config.Legend.showSessionTime = false
@@ -30,7 +35,7 @@ Duckboard.Config.Badges = {
         icon = "icon16/transmit_go.png",
         hoverText = "Connecting"
     },
-    disconnecting = {
+    disconnected = {
         icon = "icon16/transmit_delete.png",
         hoverText = "Connecting"
     }

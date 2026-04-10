@@ -48,9 +48,6 @@ function PANEL:Init()
 
             surface.SetDrawColor(DIV_COLOR)
             surface.DrawLine(0, 1, w, 1)
-
-            -- surface.SetDrawColor(DIV_COLOR.r, DIV_COLOR.g, DIV_COLOR.b, DIV_COLOR.a)
-            -- surface.DrawLine(0, h-1, w, h-1)
         end
 
         local plyLabel = vgui.Create("DLabel", self.playerLegend)
@@ -162,31 +159,8 @@ function PANEL:Init()
 
     self.playerDiv = vgui.Create("DScrollPanel", self)
     self.playerDiv:Dock(FILL)
-    --self.playerDiv:DockPadding(0, 0, 0, 5)
     self.playerDiv.Paint = function() end
     self.playerDiv.divs = {}
-
-    local function refresh(sid)
-        local p = nil
-        if IsValid(sid) then
-            p = player.GetBySteamID(sid)
-        end
-        -- TODO: UPDATE THIS REFRESHING CODE
-        if table.Count(self.playerDiv.divs) ~= 0 then
-            for _, p in pairs(self.playerDiv.divs) do
-                p:Remove()
-            end
-        end
-
-        self.playerDiv.divs = {}
-        for _, ply in pairs(player.GetAll()) do
-            local pc = vgui.Create("duckboard_player_info")
-            pc:SetPlayer(ply)
-            self.playerDiv:AddItem(pc)
-            self.playerDiv.divs[ply] = pc
-        end
-    end
-    hook.Add("Duckboard_Force_Refresh", "duckboard_refresh_playerinfo", refresh)
 
     self.ender = vgui.Create("DPanel", self)
     self.ender:SetTall(25)
@@ -236,6 +210,60 @@ function PANEL:Init()
         self.settingsButton.popup = vgui.Create("duckboard_settings_panel")
         self.settingsButton.popup:SetPos(px + sx, py + sy - 300)
     end
+end
+
+-- ---
+-- When a player connects:
+-- 1. Create a card
+-- 2. When player initializes link that card to that player
+-- 3. Refresh 
+-- ---
+function PANEL:CreatePlayerCard(name, sid)
+    local pc = vgui.Create("duckboard_player_info")
+    pc:SetConnectingPlayer(name, sid)
+
+    self.playerDiv:AddItem(pc)
+    self.playerDiv.divs[sid] = pc
+end
+
+function PANEL:RemovePlayerCard(sid)
+    if IsValid(self.playerDiv.divs[sid]) then
+        self.playerDiv.divs[sid]:Remove()
+    end
+    self.playerDiv.divs[sid] = nil
+end
+
+function PANEL:ValidatePlayerCard(ply)
+    local name = ply:Name()
+    local sid = ply:SteamID()
+    if not IsValid(self.playerDiv.divs[sid]) then
+        self:CreatePlayerCard(name, sid)
+    end
+    self.playerDiv.divs[sid]:SetPlayer(ply)
+end
+
+function PANEL:PopulateScoreboard()
+    for _, ply in pairs(player.GetAll()) do
+        self:ValidatePlayerCard(ply)
+    end
+end
+
+function PANEL:RefreshPlayerCards()
+    for k, v in pairs(self.playerDiv.divs) do
+        v:Refresh()
+    end
+end
+
+function PANEL:SetDisconnected(sid)
+    self.playerDiv.divs[sid]:SetDisconnected()
+end
+
+function PANEL:AddBadge(sid, badgeid)
+    self.playerDiv.divs[sid]:AddBadge(badgeid)
+end
+
+function PANEL:RemoveBadge(sid, badgeid)
+    self.playerDiv.divs[sid]:RemoveBadge(badgeid)
 end
 
 function PANEL:Paint(w, h)

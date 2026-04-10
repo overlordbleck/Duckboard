@@ -17,6 +17,9 @@ end
 local PANEL = {}
 
 function PANEL:Init()
+    self.connecting = true
+    self.disconnected = false
+
     self:SetTall(25)
     self:Dock(TOP)
     self:DockMargin(0, 2, 0, 0)
@@ -43,7 +46,7 @@ function PANEL:Init()
 
     self.plyName = vgui.Create("DLabel", self.nameDiv)
     self.plyName:Dock(FILL)
-    self.plyName:SetText("Disconnected...")
+    self.plyName:SetText("Connecting...")
     self.plyName:SetTextColor(TEXT_COLOR)
     self.plyName:SetFont("DUCK_FONT_NORMAL")
 
@@ -88,24 +91,28 @@ function PANEL:Init()
         local kills = vgui.Create("DLabel", kdDiv)
         kills:SetTall(t)
         kills:SetWide(50)
-        kills:SetText("10")
+        kills:SetText("")
         kills:SetTextColor(TEXT_COLOR)
         kills:SetFont("DUCK_FONT_NORMAL")
         kills:SetContentAlignment(5)
         kills.Think = function()
-            kills:SetText(self:GetPlayer():Frags())
+            local p = self:GetPlayer()
+            if not IsValid(p) then return end
+            kills:SetText(p:Frags())
         end
         kdDiv:AddItem(kills)
 
         local deaths = vgui.Create("DLabel", kdDiv)
         deaths:SetTall(t)
         deaths:SetWide(50)
-        deaths:SetText("0")
+        deaths:SetText("")
         deaths:SetTextColor(TEXT_COLOR)
         deaths:SetFont("DUCK_FONT_NORMAL")
         deaths:SetContentAlignment(5)
         deaths.Think = function()
-            deaths:SetText(self:GetPlayer():Deaths())
+            local p = self:GetPlayer()
+            if not IsValid(p) then return end
+            deaths:SetText(p:Deaths())
         end
         kdDiv:AddItem(deaths)
     end
@@ -154,12 +161,14 @@ function PANEL:Init()
         local pingLabel = vgui.Create("DLabel")
         pingLabel:SetTall(t)
         pingLabel:SetWide(100)
-        pingLabel:SetText("999")
+        pingLabel:SetText("")
         pingLabel:SetTextColor(Color(0, 255, 0))
         pingLabel:SetFont("DUCK_FONT_NORMAL")
         pingLabel:SetContentAlignment(5)
         pingLabel.Think = function()
-            pingLabel:SetText(self:GetPlayer():Ping())
+            local p = self:GetPlayer()
+            if not IsValid(p) then return end
+            pingLabel:SetText(p:Ping())
         end
 
         self.extrasGrid:AddItem(pingLabel)
@@ -196,7 +205,7 @@ end
 function PANEL:Expand()
     if not IsValid(self.controlPanel) then
         self.controlPanel = vgui.Create("duckboard_player_control", self)
-        self.controlPanel:SetPlayer(self:GetPlayer())
+        self.controlPanel:SetPlayer(self.player, self.name, self.steamid)
     end
 
     self.controlPanel:Show()
@@ -211,19 +220,50 @@ function PANEL:Depress()
     self:SetTall(25)
 end
 
+function PANEL:SetConnected()
+    self.connected = false
+end
+
+function PANEL:SetDisconnected()
+    self.disconnected = true
+    self.plyName:SetTextColor(Color(255,0,0))
+end
+
+function PANEL:SetConnectingPlayer(name, sid)
+    self._name = name
+    self._steamid = sid
+    self._steamid64 = util.SteamIDTo64(sid)
+
+    self:SetName(self._name)
+    self:SetAvatar(self._steamid64)
+    --self:AddBadge("", "connecting")
+end
+
 function PANEL:SetPlayer(ply)
     self.player = ply
+    self.name = ply:Name()
+    self.steamid = ply:SteamID()
+    self.steamid64 = ply:SteamID64()
     self.sessionStart = Duckboard.SessionTimes[self.player:SteamID()] or 0
-    self:SetAvatar(ply)
-    self:SetName(ply)
+
+    self:SetName(self.name)
+    self:SetAvatar(self.steamid64)
 end
 
-function PANEL:SetAvatar(ply)
-    self.avatar:SetPlayer(ply)
+function PANEL:AddBadge(badgeid)
+    self.badgesDiv.badgePanel:AddBadge(badgeid)
 end
 
-function PANEL:SetName(ply)
-    self.plyName:SetText(ply:GetName())
+function PANEL:RemoveBadge(badgeid)
+    self.badgesDiv.badgePanel:RemoveBadge(badgeid)
+end
+
+function PANEL:SetAvatar(sid)
+    self.avatar:SetSteamID(sid, 64)
+end
+
+function PANEL:SetName(name)
+    self.plyName:SetText(name)
 end
 
 function PANEL:GetPlayerSessionTime()

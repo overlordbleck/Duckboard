@@ -16,7 +16,7 @@ function PANEL:AddBadge(badgeid)
 
     self.badges[badgeid] = vgui.Create("DImage", self)
     self.badges[badgeid]:SetImage(Duckboard.Config.Badges[badgeid].icon)
-    self.badges[badgeid]:SetWide(y - m*2)
+    self.badges[badgeid]:SetWide(y - m * 2)
     self.badges[badgeid]:Dock(LEFT)
     self.badges[badgeid]:DockMargin(1, m, 1, m)
     self.badges[badgeid]:InvalidateParent(true)
@@ -27,8 +27,8 @@ end
 
 function PANEL:RemoveBadge(badgeid)
     if not IsValid(self.badges[badgeid]) then return end
-
     self.badges[badgeid]:Remove()
+    self.badges[badgeid] = nil
 
     self:SizeToChildren(true, false)
     self:Center()

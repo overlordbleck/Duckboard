@@ -3,6 +3,8 @@ Duckboard.Config = Duckboard.Config or {}
 Duckboard.SessionTimes = Duckboard.SessionTimes or {}
 Duckboard.Panel = Duckboard.Panel or {}
 
+local hasOpened = false
+
 surface.CreateFont("DUCK_FONT_HEADER", {
     font = "Arial",
     size = 50,
@@ -27,34 +29,93 @@ surface.CreateFont("DUCK_FONT_NORMAL", {
     weight = 500,
 })
 
+gameevent.Listen("player_connect")
+hook.Add("player_connect", "duckboard_ply_start_connect", function(data)
+    local name = data.name
+    local sid = data.networkid
+
+    if not hasOpened then return end
+    Duckboard:CreatePlayerInfo(name, sid)
+    Duckboard:GivePlayerBadge(sid, "connecting")
+end)
+
 gameevent.Listen("player_changename")
 hook.Add("player_changename", "duckboard_change_name_listen", function()
     hook.Run("Duckboard_Force_Refresh")
+
+    if not hasOpened then return end
+    Duckboard:ValidateAllPlayerCards()
 end)
 
 net.Receive("duckboard_ply_connect", function()
+    local ply = net.ReadEntity()
     local sid = net.ReadString()
     local time = net.ReadFloat()
 
     Duckboard.SessionTimes[sid] = time
-    hook.Run("Duckboard_Force_Refresh", sid)
-    PrintTable(Duckboard.SessionTimes)
+    hook.Run("Duckboard_Force_Refresh", sid) -- TODO: need?
+    
+    if not hasOpened then return end
+    Duckboard:ValidatePlayerCard(ply)
+    Duckboard:RemovePlayerBadge(sid, "connecting")
 end)
 
 net.Receive("duckboard_ply_disconnect", function()
     local sid = net.ReadString()
 
-    table.remove(Duckboard.SessionTimes, sid)
+    Duckboard.SessionTimes[sid] = nil
     hook.Run("Duckboard_Force_Refresh", sid)
+
+    if not hasOpened then return end
+    if not Duckboard.Config.showDisconnected then
+        Duckboard:RemovePlayerInfo(sid)
+    else
+        Duckboard:GivePlayerBadge(sid, "disconnected")
+        Duckboard:SetDisconnected(sid)
+    end
+    --Duckboard:RemovePlayerInfo(sid)
 end)
 
 local function BuildScoreboard()
     Duckboard.Panel = vgui.Create("duckboard_panel")
+    Duckboard.Panel:PopulateScoreboard()
+end
+
+function Duckboard:CreatePlayerInfo(name, sid)
+    self.Panel:CreatePlayerCard(name, sid)
+    self:ValidateAllPlayerCards()
+end
+
+function Duckboard:RemovePlayerInfo(sid)
+    self.Panel:RemovePlayerCard(sid)
+    self:ValidateAllPlayerCards()
+end
+
+function Duckboard:ValidatePlayerCard(ply)
+    self.Panel:ValidatePlayerCard(ply)
+end
+
+function Duckboard:ValidateAllPlayerCards()
+    self.Panel:PopulateScoreboard()
+end
+
+function Duckboard:SetDisconnected(sid)
+    self.Panel:SetDisconnected(sid)
+end
+
+function Duckboard:GivePlayerBadge(sid, badgeid)
+    if type(self.Panel) == "table" then return end
+    self.Panel:AddBadge(sid, badgeid)
+end
+
+function Duckboard:RemovePlayerBadge(sid, badgeid)
+    self.Panel:RemoveBadge(sid, badgeid)
 end
 
 function Duckboard:openScoreboard()
     if not IsValid(Duckboard.Panel) then BuildScoreboard() end
     hook.Run("Duckboard_Force_Refresh")
+    hasOpened = true
     
     Duckboard.Panel:SetVisible(true)
 
