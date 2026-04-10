@@ -270,6 +270,12 @@ function PANEL:Paint(w, h)
     draw.RoundedBox(8, 0, 0, w, h, BG_COLOR)
 end
 
+function PANEL:RefreshLayout()
+    for k, v in pairs(self.playerDiv.divs) do
+        v:LegendUpdate()
+    end
+end
+
 function PANEL:EnableInteraction()
     --self:SetPopupStayAtBack(true)
     self:MakePopup()

@@ -70,6 +70,7 @@ net.Receive("duckboard_ply_disconnect", function()
     if not Duckboard.Config.showDisconnected then
         Duckboard:RemovePlayerInfo(sid)
     else
+        Duckboard:RemoveAllBadges(sid)
         Duckboard:GivePlayerBadge(sid, "disconnected")
         Duckboard:SetDisconnected(sid)
     end
@@ -103,14 +104,25 @@ function Duckboard:SetDisconnected(sid)
     self.Panel:SetDisconnected(sid)
 end
 
+-- TODO: Networking Badges/Disconnected players
 function Duckboard:GivePlayerBadge(sid, badgeid)
-    if type(self.Panel) == "table" then return end
     self.Panel:AddBadge(sid, badgeid)
 end
 
 function Duckboard:RemovePlayerBadge(sid, badgeid)
     self.Panel:RemoveBadge(sid, badgeid)
 end
+
+function Duckboard:RemoveAllBadges(sid)
+    for k, v in pairs(self.Config.Badges) do
+        self:RemovePlayerBadge(sid, k)
+    end
+end
+
+hook.Add("Duckboard_Force_Refresh", "Duckboard_Config_Modify", function()
+    if not hasOpened then return end
+    Duckboard.Panel:RefreshLayout()
+end)
 
 function Duckboard:openScoreboard()
     if not IsValid(Duckboard.Panel) then BuildScoreboard() end
